@@ -1,0 +1,570 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled0.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyNLJGrDL/ussQoltCQ4lGMz",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/19PA1A0531/python-basics/blob/master/multiplelinear%20regression\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "C2vnzIW0U4Cn",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.linear_model import LinearRegression\n",
+        "import matplotlib.pyplot as plt"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "8eTawaaqYb3Q",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 227
+        },
+        "outputId": "eb143e51-4b66-4b56-d414-0ccf62c02fed"
+      },
+      "source": [
+        "students=pd.read_csv(\"students_placement_data.csv\")\n",
+        "students.head()"
+      ],
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Roll No</th>\n",
+              "      <th>Gender</th>\n",
+              "      <th>Section</th>\n",
+              "      <th>SSC Percentage</th>\n",
+              "      <th>inter_Diploma_percentage</th>\n",
+              "      <th>B.Tech_percentage</th>\n",
+              "      <th>Backlogs</th>\n",
+              "      <th>registered_for_ Placement_Training</th>\n",
+              "      <th>placement status</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>1</td>\n",
+              "      <td>M</td>\n",
+              "      <td>A</td>\n",
+              "      <td>87.3</td>\n",
+              "      <td>65.3</td>\n",
+              "      <td>40.00</td>\n",
+              "      <td>18</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>Not placed</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>2</td>\n",
+              "      <td>F</td>\n",
+              "      <td>A</td>\n",
+              "      <td>89.0</td>\n",
+              "      <td>92.4</td>\n",
+              "      <td>71.45</td>\n",
+              "      <td>0</td>\n",
+              "      <td>yes</td>\n",
+              "      <td>Placed</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>3</td>\n",
+              "      <td>F</td>\n",
+              "      <td>A</td>\n",
+              "      <td>67.0</td>\n",
+              "      <td>68.0</td>\n",
+              "      <td>45.26</td>\n",
+              "      <td>13</td>\n",
+              "      <td>yes</td>\n",
+              "      <td>Not placed</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>4</td>\n",
+              "      <td>M</td>\n",
+              "      <td>A</td>\n",
+              "      <td>71.0</td>\n",
+              "      <td>70.4</td>\n",
+              "      <td>36.47</td>\n",
+              "      <td>17</td>\n",
+              "      <td>yes</td>\n",
+              "      <td>Not placed</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>5</td>\n",
+              "      <td>M</td>\n",
+              "      <td>A</td>\n",
+              "      <td>67.0</td>\n",
+              "      <td>65.5</td>\n",
+              "      <td>42.52</td>\n",
+              "      <td>17</td>\n",
+              "      <td>yes</td>\n",
+              "      <td>Not placed</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "   Roll No Gender  ... registered_for_ Placement_Training  placement status\n",
+              "0        1      M  ...                                 NO        Not placed\n",
+              "1        2      F  ...                                yes            Placed\n",
+              "2        3      F  ...                                yes        Not placed\n",
+              "3        4      M  ...                                yes        Not placed\n",
+              "4        5      M  ...                                yes        Not placed\n",
+              "\n",
+              "[5 rows x 9 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Yl_90EpUkGyk",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 180
+        },
+        "outputId": "7614ab18-74fb-4834-f7e2-d0ecd5930bbf"
+      },
+      "source": [
+        "students.isna().any()"
+      ],
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Roll No                               False\n",
+              "Gender                                False\n",
+              "Section                               False\n",
+              "SSC Percentage                        False\n",
+              "inter_Diploma_percentage              False\n",
+              "B.Tech_percentage                     False\n",
+              "Backlogs                              False\n",
+              "registered_for_ Placement_Training    False\n",
+              "placement status                      False\n",
+              "dtype: bool"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YITfxbryY-AX",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "x=students[[\"SSC Percentage\",\"inter_Diploma_percentage\"]].values\n",
+        "y=students[\"B.Tech_percentage\"].values\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0PAfjztGbDPo",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "1147e2ce-804b-41ba-8c0f-e18771c490c4"
+      },
+      "source": [
+        "x.shape"
+      ],
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(117, 2)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 43
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Hb_o30GGc0co",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "32ad4a8e-70a6-4167-d06b-c0b9706ae0b0"
+      },
+      "source": [
+        "y.shape"
+      ],
+      "execution_count": 44,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(117,)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 44
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "cFUQ--kWj4d1",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "zBnoU4nok_Uu",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "788a9aa4-d4ff-48d9-e360-a3d97920e107"
+      },
+      "source": [
+        "model = LinearRegression()\n",
+        "model.fit(x_train,y_train)"
+      ],
+      "execution_count": 46,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 46
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "gec8myH9lTOd",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "5f7280e1-6b83-4f0b-9f89-79c101633548"
+      },
+      "source": [
+        "model.intercept_"
+      ],
+      "execution_count": 47,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "-8.937571546426739"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 47
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "MpfVtVhtla0O",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "4f81252f-c3ad-4ceb-e15a-cff02e52d7db"
+      },
+      "source": [
+        "model.coef_"
+      ],
+      "execution_count": 50,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([0.13815068, 0.74767901])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 50
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "yx5Q19UnlnSF",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "f9eb78f7-69a4-4b38-e1fb-c9d2ca0580a7"
+      },
+      "source": [
+        "predicted_quality=model.predict(x_test)\n",
+        "predicted_quality.shape"
+      ],
+      "execution_count": 52,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(24,)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 52
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "7ShbUHpQmGOu",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 33
+        },
+        "outputId": "e746a252-55c5-4e8d-e5cf-a894434ddb3b"
+      },
+      "source": [
+        "x_test.shape"
+      ],
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(24, 2)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 54
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "nCrCxD08mQD1",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "Actual_predicted=pd.DataFrame({\"Actual\":y_test.flatten(),\"predicted\":predicted_quality.flatten()})"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "32ThH-PJm80e",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 191
+        },
+        "outputId": "edb49af0-529c-4fa6-d76a-911577b7fa89"
+      },
+      "source": [
+        "Actual_predicted.head()"
+      ],
+      "execution_count": 60,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Actual</th>\n",
+              "      <th>predicted</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>71.49</td>\n",
+              "      <td>59.484282</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>81.10</td>\n",
+              "      <td>74.392371</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>62.98</td>\n",
+              "      <td>47.705109</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>68.70</td>\n",
+              "      <td>62.290592</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>61.02</td>\n",
+              "      <td>62.072696</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "   Actual  predicted\n",
+              "0   71.49  59.484282\n",
+              "1   81.10  74.392371\n",
+              "2   62.98  47.705109\n",
+              "3   68.70  62.290592\n",
+              "4   61.02  62.072696"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 60
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "7v4pMObGntv3",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
